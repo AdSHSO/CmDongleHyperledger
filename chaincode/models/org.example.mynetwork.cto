@@ -1,0 +1,51 @@
+/**
+ * model definition
+ */
+
+namespace org.example.mynetwork
+
+asset Printer identified by printer_id {
+    o String printer_id
+    o String type
+    o Integer usage
+    --> Customer tenant
+    --> Lender owner
+    --> Ressourcer ressourcer
+}
+asset Debt identified by debt_id {
+  o String debt_id
+  o Integer amount
+  --> Customer customer
+  --> Lender lender
+  --> Ressourcer ressourcer
+  o Boolean paid
+}
+
+abstract participant Network_Participant{
+  o String name
+  o String company
+}
+
+participant Customer identified by customer_id extends Network_Participant {
+  o String customer_id
+}
+participant Lender identified by lender_id extends Network_Participant {
+	o String lender_id
+}
+participant Ressourcer identified by ressourcer_id extends Network_Participant{
+	o String ressourcer_id
+}
+
+
+transaction DecrementUsage {
+  --> Printer printer
+}
+transaction Refill {
+  --> Printer printer
+  o Integer amount
+  o String debt_id 
+}
+
+event Refill_Status {
+    --> Printer printer
+}

@@ -1,0 +1,129 @@
+/**
+ * Access control rules for tutorial-network
+ */
+rule almightyAdmin {
+  description:  "All access"
+  participant: "org.hyperledger.composer.system.NetworkAdmin#admin"
+  operation: ALL
+  resource: "**"
+  action: ALLOW
+}
+
+rule SystemACL {
+  description:  "System ACL to permit all access"
+  participant: "ANY"
+  operation: ALL
+  resource: "org.hyperledger.composer.system.**"
+  action: ALLOW
+}
+
+rule Refill_Status_Ressourcer {
+    description: "Only Ressourcer can read status of printer"
+    participant: "org.example.mynetwork.Ressourcer"
+    operation: READ
+    resource: "org.example.mynetwork.Refill_Status"
+    action: ALLOW   
+}
+rule Refill_Status_Customer {
+    description: "Only Customer can create status of printer"
+    participant: "org.example.mynetwork.Customer"
+    operation: CREATE
+    resource: "org.example.mynetwork.Refill_Status"
+    action: ALLOW   
+}
+rule Refill_Create {
+    description: "Only customer can create debt for printer"
+    participant: "org.example.mynetwork.Customer"
+    operation: CREATE
+    resource: "org.example.mynetwork.Refill"
+    action: ALLOW 
+}
+rule Debt_Acess_Lender {
+    description: "Only attending Participants can see Asset"
+    participant(p): "org.example.mynetwork.Lender"
+    operation: READ
+    resource(r): "org.example.mynetwork.Debt"
+    condition: (
+      r.lender.getIdentifier() == p.getIdentifier()
+    )
+    action: ALLOW
+}
+rule Debt_Acess_Customer {
+    description: "Only attending Participants can see Asset"
+    participant(p): "org.example.mynetwork.Customer"
+    operation: READ
+    resource(r): "org.example.mynetwork.Debt"
+    condition: (
+      r.customer.getIdentifier() == p.getIdentifier()
+    )
+    action: ALLOW
+}
+rule Debt_Acess_Ressourcer {
+    description: "Only attending Participants can see Asset"
+    participant(p): "org.example.mynetwork.Ressourcer"
+    operation: READ
+    resource(r): "org.example.mynetwork.Debt"
+    condition: (
+      r.ressourcer.getIdentifier() == p.getIdentifier()
+    )
+    action: ALLOW
+}
+rule Debt_Transaction {
+    description: "Only customer can create debt for printer"
+    participant(p): "org.example.mynetwork.Customer"
+    operation: CREATE
+    resource(r): "org.example.mynetwork.Debt"
+    condition: (
+      r.customer.getIdentifier() == p.getIdentifier()
+    )
+  	action: ALLOW
+}
+
+rule Printer_Access {
+    description: "Only attending Participants can see Asset"
+    participant(p): "org.example.mynetwork.*"
+    operation: READ
+    resource(r): "org.example.mynetwork.Printer"
+    condition: (
+      r.owner.getIdentifier() == p.getIdentifier() ||
+      r.ressourcer.getIdentifier() == p.getIdentifier()
+    )
+    action: ALLOW
+}
+rule Printer_Access_Customer {
+    description: "Only attending Participants can see Asset"
+    participant(p): "org.example.mynetwork.Customer"
+    operation: READ,UPDATE
+    resource(r): "org.example.mynetwork.Printer"
+    condition: (
+      r.tenant.getIdentifier() == p.getIdentifier()
+    )
+    action: ALLOW
+}
+rule Printer_Transaction_Decrement {
+    description: "Only customer can invoke transactions for printer"
+    participant(p): "org.example.mynetwork.Customer"
+    operation: READ, CREATE, UPDATE
+    resource(r): "org.example.mynetwork.Printer"
+    transaction(tx): "org.example.mynetwork.DecrementUsage"
+    condition: (r.tenant.getIdentifier() == p.getIdentifier())
+    action: ALLOW
+}
+rule Printer_Transaction_Decrement_Create {
+    description: "Only customer can invoke transactions for printer"
+    participant: "org.example.mynetwork.Customer"
+    operation: CREATE
+    resource: "org.example.mynetwork.DecrementUsage"
+    action: ALLOW
+}
+rule Printer_Transaction_Refill {
+    description: "Only customer can invoke transactions for printer"
+    participant(p): "org.example.mynetwork.Customer"
+    operation: READ,CREATE, UPDATE
+    resource(r): "org.example.mynetwork.Printer"
+    transaction(tx): "org.example.mynetwork.Refill"
+    condition: (r.tenant.getIdentifier() == p.getIdentifier())
+    action: ALLOW
+}
+
+
